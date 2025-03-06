@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>DeepMoat</title>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+<main class="container-xxl pt-5 flex-grow-1">
+<header>
+    <div class="header-box1">
+        <h1>DeepMoat</h1>
+    </div>
+    <div class="header-box2">
+        <form action="/submit" method="POST">
+            <input id="input" type="text" name="ticker" id="" cols="30" rows="10" placeholder="Enter stock symbol"></input>
+            <input type="submit" value="Search">
+        </form>
+    </div>
+    <div>
+        <h4>Made by Adrian Wan</h4>
+    </div>
+</header>
+
+<% if (locals.content && locals.companyInfo, locals.calculations) { %>
+<div class="topline">
+    <div class="topline1">
+        <h3><%= companyInfo.Name %></h3>
+    </div>
+    <div class="topline2">
+        <h3>Currency</h3>
+        <p><%=companyInfo.Currency%></p>
+    </div>
+    <!-- <div class="topline3">
+        <h3>Price</h3>
+        <p>1234</p> 
+    </div>-->
+    <div class="topline4">
+        <h3>P/E TTM</h3>
+        <p><%=companyInfo.PERatio%></p>
+    </div>
+</div>
+
+<div class="main">
+    <div class="big4">
+        <h3>Big 4 Growth Rates</h3>
+        <p>What is the trajectory of the company’s growth on key metrics from the financial statements?</p>
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>        
+                    <th style="width:50%"></th>
+                    <th>10-year</th>
+                    <th>5-year</th>
+                    <th>1-year</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Revenue Growth</td>
+                <td><%= calculations.revenueGrowth10 %></td>
+                <td><%= calculations.revenueGrowth5 %></td>
+                <td><%= calculations.revenueGrowth1 %></td>
+            </tr>
+            <tr>
+                <td>Earnings Growth</td>
+                <td><%= calculations.earningsGrowth10 %></td>
+                <td><%= calculations.earningsGrowth5 %></td>
+                <td><%= calculations.earningsGrowth1 %></td>
+            </tr>
+            <tr> 
+                <td>Equity Growth</td>
+                <td><%= calculations.equityGrowth10 %></td>
+                <td><%= calculations.equityGrowth5 %></td>
+                <td><%= calculations.equityGrowth1 %></td>
+            </tr>
+            <tr>
+                <td>Free Cashflow Growth</td>
+                <td><%= calculations.freeCashFlowGrowth10 %></td>
+                <td><%= calculations.freeCashFlowGrowth5 %></td>
+                <td><%= calculations.freeCashFlowGrowth1 %></td>
+            </tr>
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+        <p>Data up until fiscal date ending <%= content[0].fiscalDateEnding %>.</p>
+    </div>
+    <div class="mos">
+        <h3>Margin of Safety Valuation</h3>
+        <p>Enter your EPS 10-year growth and P/E estimate to get Margin of Safety price.</p>
+        
+        <div class="mosClac">
+        <div>
+        <p>EPS 10-year growth est.</p>
+        <input type="text" id="epsGrowth">
+        </div>
+        <div><p>P/E est.</p>
+        <input type="text" id="peEstimate">
+        </div>
+        <input type="button" id="calculateBtn" value="Calculate">
+    </div>
+
+        <table>
+            <tr>
+                <td style="width:50%">EPS TTM</td>
+                <td id="epsTTM" type="number"><%=companyInfo.DilutedEPSTTM%></td>
+            </tr>
+            <tr>
+                <td>Sticker Price</td>
+                <td id="stickerPrice"></td>
+            </tr>
+            <tr>
+                <td>MOS Price</td>
+                <td id="mosPrice"></td>
+            </tr>   
+        </table>
+    </div>
+
+<div class="raw">
+    <h3>Annual Data</h3>
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    Year
+                </th>
+                <th>
+                    Revenue
+                </th>
+                <th>
+                    Earnings
+                </th>
+                <th>
+                    Equity
+                </th>
+                <th>
+                    Free Cashflow
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <% for (let index = 0; index < 11; index++) { %>
+            <tr>
+                <td><%= content[index].fiscalDateEnding %></td>
+                <td><%= content[index].totalRevenue %></td>
+                <td><%= content[index].netIncome %></td>
+                <td><%= content[index].totalAssets - content[index].totalLiabilities %></td>
+                <td><%= content[index].operatingCashflow - content[index].capitalExpenditures %></td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+</div>
+<!-- inesrt else section "Begin by entering a stock symbol above (e.g. AMZN)" -->
+<% } else { %>
+    <div>
+        <h3 id="defaultText">Begin by entering a stock symbol above (e.g. AMZN)</h3>
+    </div>
+    
+<% } %>
+</main>
+
+<footer class="footer mt-auto py-3 bg-body-tertiary">
+    <div class="container">
+      <span class="text-body-secondary">This websites uses data from the Alpha Vantage API free tier, which has a rate limit of 25 requests per day. Sample data will be used for demonstration once this limit is reached.</span>
+    </div>
+</footer>
+  
+<script src="/js/scripts.js"></script>
+</body>
+</html>

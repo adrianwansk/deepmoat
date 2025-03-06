@@ -5,6 +5,7 @@ import axios from "axios";
 const app = express();
 const port = 3000;
 
+// Note: This project uses the AlphaVantage API. The API key used here has a limit of 25 requests per day. You can get your own free API key at [AlphaVantage](https://www.alphavantage.co/support/#api-key).
 const apiKey = "QW8G16PJP5FN70HC";
 
 //Make the styling show up
